@@ -7,7 +7,7 @@ from SocketServer import ThreadingMixIn
 import json
 import pyltp
 from pyltp import SentenceSplitter,Segmentor,Postagger,NamedEntityRecognizer,Parser,SementicRoleLabeller
-
+import jieba
 
 global segmentor, postagger, recognizer
 segmentor = Segmentor()
@@ -33,10 +33,16 @@ def cut_words(sentence):
     # segmentor.load('../ltp_data/cws.model')  # 加载模型
     if isinstance(sentence,unicode):
         sentence = sentence.encode("utf8")
-    wordsList = segmentor.segment(sentence)  # 分词 
+    wordsList = jieba.cut(sentence,cut_all=False)
+    # wordsList = segmentor.segment(sentence)  # 分词 
     # print '\t'.join(words)
     # segmentor.release()  # 释放模型
-    return [x for x in wordsList]
+    words_list = []
+    for word in wordsList:
+        if isinstance(word,unicode):
+    	    word = word.encode("utf8")
+            words_list.append(word)
+    return words_list
 
 # 词性标注
 def post_tagger(wordsList):
@@ -115,6 +121,7 @@ class Handler(BaseHTTPRequestHandler):
         if method == "cutWords":
             sentence = jdata["sentence"]
             wordsList = cut_words(sentence)
+            for word in wordsList:
             response['wordsList'] = wordsList
 
         elif method == "postTag":
