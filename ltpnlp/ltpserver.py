@@ -121,7 +121,6 @@ class Handler(BaseHTTPRequestHandler):
         if method == "cutWords":
             sentence = jdata["sentence"]
             wordsList = cut_words(sentence)
-            for word in wordsList:
             response['wordsList'] = wordsList
 
         elif method == "postTag":
